@@ -9,9 +9,21 @@
 <body>
     <div class="container">
         <h1>Resume Parser</h1>
-        <textarea id="resumeText" placeholder="Paste your resume text here..."></textarea>
-        <button onclick="parseResume()">Parse Resume</button>
-        <div id="result"></div>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" id="resume" name="resume" accept=".pdf,.docx" required>
+            <button type="submit">Upload Resume</button>
+        </form>
+        <div id="results">
+            <h2>Parsed Details</h2>
+            <div id="skills">
+                <h3>Skills:</h3>
+                <ul></ul>
+            </div>
+            <div id="education">
+                <h3>Education:</h3>
+                <ul></ul>
+            </div>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
