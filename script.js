@@ -11,7 +11,6 @@ document.getElementById('uploadForm').addEventListener('submit', async function(
     const result = await response.json();
     if (response.ok) {
         displayResults(result);
-        playSound();
     } else {
         alert(result.error);
     }
@@ -21,10 +20,12 @@ function displayResults(result) {
     const skillsList = document.querySelector('#skills ul');
     const educationList = document.querySelector('#education ul');
     const experienceList = document.querySelector('#experience ul');
+    const atsScore = document.querySelector('#ats_score p');
 
     skillsList.innerHTML = '';
     educationList.innerHTML = '';
     experienceList.innerHTML = '';
+    atsScore.innerHTML = '';
 
     result.skills.forEach(skill => {
         const li = document.createElement('li');
@@ -43,9 +44,12 @@ function displayResults(result) {
         li.innerHTML = `<strong>${exp.title}</strong><br>${exp.details.join('<br>')}`;
         experienceList.appendChild(li);
     });
+
+    atsScore.textContent = `Your ATS score is: ${result.ats_score}`;
+    playNotificationSound();
 }
 
-function playSound() {
+function playNotificationSound() {
     const audio = new Audio('notification.mp3');
     audio.play();
 }
