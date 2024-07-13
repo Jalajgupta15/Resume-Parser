@@ -1,14 +1,10 @@
 from flask import Flask, request, jsonify
-from pdfminer.converter import TextConverter
-from pdfminer.pdfinterp import PDFPageInterpreter, PDFResourceManager
-from pdfminer.layout import LAParams
-from pdfminer.pdfpage import PDFPage
-import io
+from pdfminer.high_level import extract_text as extract_text_from_pdf
 import docx2txt
-import re
 import spacy
 import pandas as pd
 from nltk.corpus import stopwords
+import re
 import os
 
 app = Flask(__name__)
@@ -26,24 +22,6 @@ EDUCATION = [
     'BTECH', 'B.Tech', 'M.Tech', 'MTECH',
     'SSC', 'HSC', 'CBSE', 'ICSE', 'X', 'XII'
 ]
-
-def extract_text_from_pdf(pdf_file):
-    resource_manager = PDFResourceManager()
-    fake_file_handle = io.StringIO()
-    converter = TextConverter(resource_manager, fake_file_handle, codec='utf-8', laparams=LAParams())
-    page_interpreter = PDFPageInterpreter(resource_manager, converter)
-    
-    with open(pdf_file, 'rb') as fh:
-        for page in PDFPage.get_pages(fh, caching=True, check_extractable=True):
-            page_interpreter.process_page(page)
-    
-    text = fake_file_handle.getvalue()
-    
-    # close open handles
-    converter.close()
-    fake_file_handle.close()
-    
-    return text
 
 def extract_text_from_doc(doc_path):
     return docx2txt.process(doc_path)
@@ -95,6 +73,16 @@ def extract_experience(resume_text):
             experience.append(exp)
     return experience
 
+def calculate_ats_score(skills, education, experience):
+    score = 0
+    if skills:
+        score += len(skills) * 10
+    if education:
+        score += len(education) * 15
+    if experience:
+        score += len(experience) * 20
+    return score
+
 @app.route('/parse_resume', methods=['POST'])
 def parse_resume():
     file = request.files['file']
@@ -108,8 +96,9 @@ def parse_resume():
     skills = extract_skills(resume_text)
     education = extract_education(resume_text)
     experience = extract_experience(resume_text)
+    ats_score = calculate_ats_score(skills, education, experience)
     
-    return jsonify({"skills": skills, "education": education, "experience": experience})
+    return jsonify({"skills": skills, "education": education, "experience": experience, "ats_score": ats_score})
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=os.getenv('PORT', 5000))
