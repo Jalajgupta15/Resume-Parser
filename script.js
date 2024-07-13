@@ -20,8 +20,11 @@ document.getElementById('uploadForm').addEventListener('submit', async function(
 function displayResults(result) {
     const skillsList = document.querySelector('#skills ul');
     const educationList = document.querySelector('#education ul');
+    const experienceList = document.querySelector('#experience ul');
+
     skillsList.innerHTML = '';
     educationList.innerHTML = '';
+    experienceList.innerHTML = '';
 
     result.skills.forEach(skill => {
         const li = document.createElement('li');
@@ -33,6 +36,12 @@ function displayResults(result) {
         const li = document.createElement('li');
         li.textContent = typeof edu === 'string' ? edu : `${edu[0]} (${edu[1]})`;
         educationList.appendChild(li);
+    });
+
+    result.experience.forEach(exp => {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${exp.title}</strong><br>${exp.details.join('<br>')}`;
+        experienceList.appendChild(li);
     });
 }
 
